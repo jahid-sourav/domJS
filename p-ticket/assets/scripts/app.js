@@ -1,36 +1,37 @@
 // Common Functions Starts Here
-function elementById(elementId){
+function elementById(elementId) {
     const element = document.getElementById(elementId);
     return element;
 }
-function elementsByClassName(className){
+function elementsByClassName(className) {
     const elements = document.getElementsByClassName(className);
     return elements;
 }
-function elementByQuerySelector(element){
+function elementByQuerySelector(element) {
     const theElement = document.querySelector(element);
     return theElement;
 }
-function textToInteger(element){
+function textToInteger(element) {
     return parseInt(element.innerText)
 }
-function getInnerText(element){
+function getInnerText(element) {
     const innerTextOfAnElement = element.innerText;
     return innerTextOfAnElement;
 }
-function setInnerText(element, value){
+function setInnerText(element, value) {
     element.innerText = value;
 }
-function remainingSeat(theTotalSeat, totalSelectedSeat){
+function remainingSeat(theTotalSeat, totalSelectedSeat) {
     return theTotalSeat - totalSelectedSeat;
 }
-function createAnHtmlElement(element){
+function createAnHtmlElement(element) {
     return document.createElement(element);
 }
-function appendContent(place, item){
+function appendContent(place, item) {
     return place.appendChild(item);
 }
 function validatePassengerNumber(inputFieldValue) {
+    const regex = /^01[3-9]\d{8}$/;
     if (!regex.test(inputFieldValue)) {
         addClass(passengerNumberElement, 'border-red-600');
         return false;
@@ -64,10 +65,10 @@ function enableApplyButton() {
         addClass(applyButton, 'opacity-50');
     }
 }
-function addClass(element, nameOfTheClass){
+function addClass(element, nameOfTheClass) {
     element.classList.add(nameOfTheClass);
 }
-function removeClass(element, nameOfTheClass){
+function removeClass(element, nameOfTheClass) {
     element.classList.remove(nameOfTheClass);
 }
 // Common Functions Ends Here
@@ -78,14 +79,13 @@ const totalSeat = textToInteger(totalSeatElement);
 const perSeatPriceElement = elementById('perSeatPrice');
 const perSeatPrice = textToInteger(perSeatPriceElement);
 const selectedSeatElement = elementById('selectedSeat');
-let   selectedSeat = textToInteger(selectedSeatElement);
+let selectedSeat = textToInteger(selectedSeatElement);
 const totalPriceElement = elementById('totalPrice');
-let   totalPrice = textToInteger(totalPriceElement);
+let totalPrice = textToInteger(totalPriceElement);
 const grandTotalElement = elementById('grandTotal');
 const grandTotal = textToInteger(grandTotalElement);
 const seatNumbers = elementsByClassName('seat-number');
 const seatInfoContainer = elementById('seatInfoContainer');
-const regex = /^01[3-9]\d{8}$/;
 const passengerNumberElement = elementById('passengerNumber');
 let passengerNumber = '';
 passengerNumberElement.addEventListener('keyup', function (event) {
@@ -99,26 +99,24 @@ const footerElement = elementByQuerySelector('footer');
 const afterPurchase = elementByQuerySelector('.after-purchase');
 const continueButton = elementById('continueButton');
 const applyButton = elementById('applyButton');
-const newCouponCode = getInnerText(elementById('newCoupon'));
-const coupleCouponCode = getInnerText(elementById('coupleCoupon'));
-const applyCouponArea = elementById('applyCouponArea');
 const couponInputElement = elementById('couponInput');
 const discountInfo = elementById('discountInfo');
-const passengerName = elementById('passengerName'); 
+const passengerName = elementById('passengerName');
 const passengerEmail = elementById('passengerEmail');
 const errorMessage = elementById('errorMessage');
 // Variables Ends Here 
 
 // Seat Number Iteration Starts Here 
 let selectedSeatCount = 0;
-for(const seatNumber of seatNumbers){
-    seatNumber.addEventListener('click', function(event){
-        if(!event.target.classList.contains('bg-green-color')){
+const appendedContent = [];
+for (const seatNumber of seatNumbers) {
+    seatNumber.addEventListener('click', function (event) {
+        if (!event.target.classList.contains('bg-green-color')) {
             if (selectedSeatCount < 4) {
                 addClass(event.target, 'bg-green-color');
                 addClass(event.target, 'text-white');
-                selectedSeat+=1;
-                selectedSeatCount+=1;
+                selectedSeat += 1;
+                selectedSeatCount += 1;
                 setInnerText(selectedSeatElement, selectedSeat);
                 setInnerText(totalSeatElement, remainingSeat(totalSeat, selectedSeat));
                 const div = createAnHtmlElement('div');
@@ -137,7 +135,8 @@ for(const seatNumber of seatNumbers){
                     </div>
                 `;
                 appendContent(seatInfoContainer, div);
-                totalPrice+=perSeatPrice;
+                appendedContent.push(div);
+                totalPrice += perSeatPrice;
                 setInnerText(totalPriceElement, totalPrice);
                 setInnerText(grandTotalElement, totalPrice);
                 enableNextButton();
@@ -145,39 +144,40 @@ for(const seatNumber of seatNumbers){
             } else {
                 alert('You Can Select A Maximum Of 4 Seat.');
             }
-        }else{
+        } else {
             removeClass(event.target, 'bg-green-color');
             removeClass(event.target, 'text-white');
-            selectedSeat-=1;
-            selectedSeatCount-=1;
+            selectedSeat -= 1;
+            selectedSeatCount -= 1;
             setInnerText(selectedSeatElement, selectedSeat);
             setInnerText(totalSeatElement, remainingSeat(totalSeat, selectedSeat));
-            totalPrice-=perSeatPrice;
+            totalPrice -= perSeatPrice;
             setInnerText(totalPriceElement, totalPrice);
             setInnerText(grandTotalElement, totalPrice);
             enableNextButton();
             enableApplyButton();
+            const removedContent = appendedContent.pop();
+            removedContent.style.display = 'none';
         }
     });
 }
 // Seat Number Iteration Ends Here 
 
 // After Next Button Clicking Functionality Starts Here
-nextButtonElement.addEventListener('click', function(){
+nextButtonElement.addEventListener('click', function () {
     addClass(headerElement, 'hidden');
     addClass(mainElement, 'hidden');
     addClass(footerElement, 'hidden');
     removeClass(afterPurchase, 'hidden');
     passengerNumberElement.value = '';
     discountInfo.innerHTML = '';
-    removeClass(applyCouponArea, 'hidden');
     passengerName.value = '';
     passengerEmail.value = '';
 })
 // After Next Button Clicking Functionality Ends Here
 
 // After Continue Button Clicking Functionality Starts Here
-continueButton.addEventListener('click', function(){
+continueButton.addEventListener('click', function () {
     removeClass(headerElement, 'hidden');
     removeClass(mainElement, 'hidden');
     removeClass(footerElement, 'hidden');
@@ -195,16 +195,21 @@ continueButton.addEventListener('click', function(){
     enableApplyButton();
     removeClass(passengerNumberElement, 'border-red-600');
     errorMessage.innerText = '';
-    for(const seatNumber of seatNumbers){
+    for (const seatNumber of seatNumbers) {
         seatNumber.classList.remove('bg-green-color', 'text-white');
+        removeClass(seatNumber, 'cursor-not-allowed');
+        removeClass(seatNumber, 'opacity-50');
         seatNumber.removeAttribute('disabled');
     }
+    removeClass(applyCouponArea, 'hidden');
 })
 // After Continue Button Clicking Functionality Ends Here
 
 // After Apply Button Clicking Functionality Starts Here
-applyButton.addEventListener('click', function(){
-    if(couponInputElement.value === newCouponCode){
+applyButton.addEventListener('click', function () {
+    const newCouponCode = getInnerText(elementById('newCoupon'));
+    const coupleCouponCode = getInnerText(elementById('coupleCoupon'));
+    if (couponInputElement.value === newCouponCode) {
         const discountPrice = (totalPrice * 0.15);
         const div = createAnHtmlElement('div');
         div.innerHTML = `
@@ -221,8 +226,13 @@ applyButton.addEventListener('click', function(){
         totalPrice -= discountPrice;
         setInnerText(grandTotalElement, totalPrice);
         couponInputElement.value = '';
+        for(const seatNumber of seatNumbers){
+            addClass(seatNumber, 'cursor-not-allowed');
+            addClass(seatNumber, 'opacity-50');
+            seatNumber.setAttribute('disabled', true);
+        }
         addClass(applyCouponArea, 'hidden');
-    }else if(couponInputElement.value === coupleCouponCode){
+    } else if (couponInputElement.value === coupleCouponCode) {
         const discountPrice = (totalPrice * 0.20);
         const div = createAnHtmlElement('div');
         div.innerHTML = `
@@ -239,8 +249,13 @@ applyButton.addEventListener('click', function(){
         totalPrice -= discountPrice;
         setInnerText(grandTotalElement, totalPrice);
         couponInputElement.value = '';
+        for(const seatNumber of seatNumbers){
+            addClass(seatNumber, 'cursor-not-allowed');
+            addClass(seatNumber, 'opacity-50');
+            seatNumber.setAttribute('disabled', true);
+        }
         addClass(applyCouponArea, 'hidden');
-    }else{
+    } else {
         couponInputElement.value = '';
         alert('Invalid coupon code.');
     }
