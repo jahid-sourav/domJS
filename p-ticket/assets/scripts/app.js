@@ -113,35 +113,50 @@ const errorMessage = elementById('errorMessage');
 let selectedSeatCount = 0;
 for(const seatNumber of seatNumbers){
     seatNumber.addEventListener('click', function(event){
-        if (selectedSeatCount < 4) {
-            event.target.classList.add('bg-green-color', 'text-white');
-            selectedSeat+=1;
-            selectedSeatCount+=1;
+        if(!event.target.classList.contains('bg-green-color')){
+            if (selectedSeatCount < 4) {
+                addClass(event.target, 'bg-green-color');
+                addClass(event.target, 'text-white');
+                selectedSeat+=1;
+                selectedSeatCount+=1;
+                setInnerText(selectedSeatElement, selectedSeat);
+                setInnerText(totalSeatElement, remainingSeat(totalSeat, selectedSeat));
+                const div = createAnHtmlElement('div');
+                div.setAttribute('id', event.target.id)
+                div.innerHTML = `
+                    <div class="grid grid-cols-3 gap-2 xl:gap-32 mt-4 justify-items-center xl:justify-items-start">
+                        <h5 class="inter-font font-normal text-[16px] text-dark-color/[.6]">
+                            ${event.target.innerText}
+                        </h5>
+                        <h5 class="inter-font font-normal text-[16px] text-dark-color/[.6]">
+                            Economoy
+                        </h5>
+                        <h5 class="inter-font font-normal text-[16px] text-dark-color/[.6]">
+                            ${perSeatPrice}
+                        </h5>
+                    </div>
+                `;
+                appendContent(seatInfoContainer, div);
+                totalPrice+=perSeatPrice;
+                setInnerText(totalPriceElement, totalPrice);
+                setInnerText(grandTotalElement, totalPrice);
+                enableNextButton();
+                enableApplyButton();
+            } else {
+                alert('You Can Select A Maximum Of 4 Seat.');
+            }
+        }else{
+            removeClass(event.target, 'bg-green-color');
+            removeClass(event.target, 'text-white');
+            selectedSeat-=1;
+            selectedSeatCount-=1;
             setInnerText(selectedSeatElement, selectedSeat);
             setInnerText(totalSeatElement, remainingSeat(totalSeat, selectedSeat));
-            const div = createAnHtmlElement('div');
-            div.innerHTML = `
-                <div class="grid grid-cols-3 gap-2 xl:gap-32 mt-4 justify-items-center xl:justify-items-start">
-                    <h5 class="inter-font font-normal text-[16px] text-dark-color/[.6]">
-                        ${event.target.innerText}
-                    </h5>
-                    <h5 class="inter-font font-normal text-[16px] text-dark-color/[.6]">
-                        Economoy
-                    </h5>
-                    <h5 class="inter-font font-normal text-[16px] text-dark-color/[.6]">
-                        ${perSeatPrice}
-                    </h5>
-                </div>
-            `;
-            appendContent(seatInfoContainer, div);
-            totalPrice+=perSeatPrice;
+            totalPrice-=perSeatPrice;
             setInnerText(totalPriceElement, totalPrice);
             setInnerText(grandTotalElement, totalPrice);
-            event.target.setAttribute('disabled', true);
             enableNextButton();
             enableApplyButton();
-        } else {
-            alert('You Can Select A Maximum Of 4 Seat.');
         }
     });
 }
